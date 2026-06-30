@@ -76,6 +76,18 @@ def register_organization(
     db.add(organization)
 
     # Create the first admin user
+    # Provision real infrastructure for this tenant
+    # If this fails, we must not save the organization or user
+    from app.services.tenant_service import provision_tenant_infrastructure
+
+    try:
+        provision_tenant_infrastructure(vector_collection, s3_prefix)
+    except Exception:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to provision tenant infrastructure. Please try again.",
+        )
     user = User(
         id=uuid.uuid4(),
         org_id=org_id,
