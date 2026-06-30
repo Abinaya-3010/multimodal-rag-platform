@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from app.core.config import get_settings
 from app.api.v1.auth import router as auth_router
+from app.api.v1.documents import router as documents_router
 
 settings = get_settings()
 
@@ -12,8 +13,8 @@ app = FastAPI(
 )
 
 # Register routers
-# All auth endpoints are now available under /auth/...
 app.include_router(auth_router, prefix="/api/v1")
+app.include_router(documents_router, prefix="/api/v1")
 
 
 @app.get("/health")
